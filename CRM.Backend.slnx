@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/sql/" />
+  <Folder Name="/src/">
+    <Project Path="src/CRM.Backend.Infra/CRM.Backend.Infra.csproj" />
+    <Project Path="src/CRM.Backend.Api/CRM.Backend.Api.csproj" />
+    <Project Path="src/CRM.Backend.Application/CRM.Backend.Application.csproj" />
+    <Project Path="src/CRM.Backend.Domain/CRM.Backend.Domain.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CRM.Backend.Tests.Integration/CRM.Backend.Tests.Integration.csproj" />
+    <Project Path="tests/CRM.Backend.Tests.Unit/CRM.Backend.Tests.Unit.csproj" />
+  </Folder>
+</Solution>
