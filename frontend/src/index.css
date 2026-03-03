@@ -120,3 +120,6 @@ button:disabled { background-color: #94a3b8; cursor: not-allowed; }
 /* Error */
 .error { color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 0.5rem 1rem; }
 
+/* CEP Loading */
+.cep-loading { font-size: 0.85rem; color: #4361ee; font-style: italic; margin-left: 0.5rem; }
+
