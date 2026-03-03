@@ -7,23 +7,16 @@ using Npgsql;
 
 namespace CRM.Backend.Infra.Persistence;
 
-public class EventStoreRepository : IEventStoreRepository
+public class EventStoreRepository(DbConnectionFactory factory, IEnumerable<IProjection> projections, ILogger<EventStoreRepository> logger) : IEventStoreRepository
 {
-    private readonly DbConnectionFactory _factory;
-    private readonly IEnumerable<IProjection> _projections;
-    private readonly ILogger<EventStoreRepository> _logger;
+    private readonly DbConnectionFactory _factory = factory;
+    private readonly IEnumerable<IProjection> _projections = projections;
+    private readonly ILogger<EventStoreRepository> _logger = logger;
 
     private static readonly JsonSerializerSettings JsonSettings = new()
     {
         TypeNameHandling = TypeNameHandling.None
     };
-
-    public EventStoreRepository(DbConnectionFactory factory, IEnumerable<IProjection> projections, ILogger<EventStoreRepository> logger)
-    {
-        _factory = factory;
-        _projections = projections;
-        _logger = logger;
-    }
 
     public async Task AppendEventsAsync(Guid streamId, IEnumerable<DomainEvent> events, EventMetadata metadata, CancellationToken ct = default)
     {
@@ -90,7 +83,7 @@ public class EventStoreRepository : IEventStoreRepository
             "SELECT event_type, event_data::text FROM event_store WHERE stream_id = @streamId ORDER BY stream_version",
             new { streamId });
 
-        return rows.Select(r => DeserializeEvent(r.event_type, r.event_data)).Where(e => e != null).Select(e => e!).ToList();
+        return [.. rows.Select(r => DeserializeEvent(r.event_type, r.event_data)).Where(e => e != null).Select(e => e!)];
     }
 
     public async Task<IEnumerable<StoredEvent>> GetStoredEventsAsync(Guid streamId, CancellationToken ct = default)
@@ -102,7 +95,7 @@ public class EventStoreRepository : IEventStoreRepository
               FROM event_store WHERE stream_id = @streamId ORDER BY stream_version",
             new { streamId });
 
-        return rows.Select(r => new StoredEvent(r.id, r.stream_id, r.event_type, r.event_data, r.metadata ?? "{}", r.stream_version, r.created_at, r.actor_user_id, r.actor_email, r.actor_name, r.correlation_id)).ToList();
+        return [.. rows.Select(r => new StoredEvent(r.id, r.stream_id, r.event_type, r.event_data, r.metadata ?? "{}", r.stream_version, r.created_at, r.actor_user_id, r.actor_email, r.actor_name, r.correlation_id))];
     }
 
     private static async Task<int> GetCurrentVersionAsync(NpgsqlConnection conn, Guid streamId, NpgsqlTransaction tx, CancellationToken ct)
